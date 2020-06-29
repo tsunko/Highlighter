@@ -55,7 +55,7 @@ public class ConfigInterface {
         HLConfig config = HighlighterPlugin.getConfiguration(invoker.as(Player.class).getUniqueId());
         ChatColor newColor = ChatColor.getByChar(color.charAt(0));
         if(newColor != null){
-            config.setColor(newColor);
+            config.setHighlightColor(newColor);
             invoker.sendMessage(ChatColor.GREEN + "Set your highlighting color to " + (newColor + newColor.name()));
         } else {
             invoker.sendMessage(ChatColor.RED + "No such chat color by that character.");

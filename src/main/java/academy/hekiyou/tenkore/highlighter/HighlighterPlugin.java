@@ -18,6 +18,7 @@ import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Matcher;
 
 public class HighlighterPlugin extends TenkorePlugin implements Listener {
     
@@ -61,21 +62,25 @@ public class HighlighterPlugin extends TenkorePlugin implements Listener {
     
     @EventHandler(priority = EventPriority.HIGHEST) // last person to receive events
     public void catchChatEvent(AsyncPlayerChatEvent event){
+        if(event.isCancelled())
+            return;
+            
         String message = event.getMessage();
         
         for(Player player : event.getRecipients()){
             if(player == null)
                 continue;
-            
-            String toSend = message;
-            ChatColor lastColor = getLastChatColor(toSend);
+    
             HLConfig config = HighlighterPlugin.getConfiguration(player.getUniqueId());
+            if(config.hasPattern()){
+                Matcher matcher = config.getPattern().matcher(message);
+                ChatColor lastColor = getLastChatColor(message);
+                message = matcher.replaceAll(config.getHighlightColor() + "$1" + lastColor);
+            }
             
-            for(String word : config.getWords())
-                toSend = toSend.replaceAll("\\b(?i)(" + word + ")\\b", config.getColor() + "$1" + lastColor);
-            
-            player.sendMessage(String.format(event.getFormat(), event.getPlayer().getDisplayName(), toSend));
+            player.sendMessage(String.format(event.getFormat(), event.getPlayer().getDisplayName(), message));
         }
+        
         event.getRecipients().clear();
     }
     
